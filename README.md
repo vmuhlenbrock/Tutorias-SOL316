@@ -6,8 +6,8 @@ A continuación se presenta todo el material respectivo a los seminarios y tutor
 
 ## Calendario seminarios
 
--| Nº de Seminario | Expositores | Fecha Presentación | Fecha Tutoría | Material Tutoría |
-|---|---|---|---|---|---|
+| Nº de Seminario | Expositores | Fecha Presentación | Fecha Tutoría | Material Tutoría |
+|---|---|---|---|---|
 | 1 | Catalina Álvarez, Constanza Bustamante y Sebastián Contreras | lunes 30 de marzo | viernes 27 de marzo | pres |
 | 2 | Felipe Reyes | miércoles 1 de abril | martes 31 de marzo | pres |
 | 3 | Cecilia Astorga y Catalina de la Barrera | lunes 20 de abril | viernes 17 de abril | pres |
