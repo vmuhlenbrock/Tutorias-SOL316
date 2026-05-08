@@ -4,6 +4,8 @@ Este repositorio contiene las presentaciones de las tutorías para los seminario
 
 A continuación se presenta todo el material respectivo a los seminarios y tutorías del primer semestre de 2026.
 
+**Importante!** las presentaciones [Pres] en html se encuentran alojadas en https://raw.githack.com/, por lo que al ser redirigidos deben seleccionar la opción *open now* para visualizar la presentación.
+
 ## Calendario seminarios
 
 | Nº de Seminario | Expositores | Fecha Presentación | Fecha Tutoría | Material Tutoría |
