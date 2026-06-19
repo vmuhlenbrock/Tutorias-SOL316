@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutoría Seminario 8 · SOL316</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root {
+  --col-moore:   #B85C2A;
+  --col-cadena:  #2B604C;
+  --col-compare: #433176;
+  --col-refs:    #1F3248;
+  --bg-page:     #F5EFE4;
+  --bg-card:     rgba(255,255,255,0.72);
+  --txt-main:    #251E18;
+  --txt-sub:     #5A5048;
+  --txt-dim:     #9A9088;
+  --cover-bg:    #111927;
+  --cover-txt:   #EDE7D9;
+}
+
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: #0B1018;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ============================================================
+   DECK
+   ============================================================ */
+.deck {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+/* ============================================================
+   SLIDES  — shared
+   ============================================================ */
+.slide {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.slide.active {
+  opacity: 1; transform: translateX(0);
+  pointer-events: all; z-index: 1;
+}
+.slide.exit {
+  opacity: 0; transform: translateX(-60px);
+  pointer-events: none; z-index: 0;
+}
+
+/* ============================================================
+   SLIDE 1 — COVER
+   ============================================================ */
+.slide-cover {
+  background: var(--cover-bg);
+  justify-content: center; align-items: center; text-align: center;
+  position: relative; overflow: hidden;
+}
+/* diagonal fine weave — Andean textile nod */
+.slide-cover::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(60deg,  transparent, transparent 28px, rgba(255,255,255,.025) 28px, rgba(255,255,255,.025) 29px),
+    repeating-linear-gradient(120deg, transparent, transparent 28px, rgba(255,255,255,.02)  28px, rgba(255,255,255,.02)  29px);
+  pointer-events: none;
+}
+/* color vein top-left */
+.slide-cover::after {
+  content: '';
+  position: absolute; top: -120px; left: -120px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle at 30% 30%, rgba(184,92,42,.28) 0%, rgba(43,96,76,.18) 55%, transparent 75%);
+  pointer-events: none;
+}
+.cover-inner {
+  position: relative; z-index: 2;
+  max-width: 720px; padding: 2.5rem 2rem;
+}
+.cover-course {
+  font-size: .72rem; font-weight: 400; letter-spacing: .28em;
+  text-transform: uppercase; color: rgba(237,231,217,.45);
+  margin-bottom: 2.5rem;
+}
+.cover-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.8rem, 5.5vw, 4.5rem); font-weight: 700; line-height: 1.05;
+  color: var(--cover-txt);
+}
+.cover-bar {
+  width: 72px; height: 3px; margin: 1.6rem auto;
+  background: linear-gradient(90deg, var(--col-moore), var(--col-cadena));
+  border-radius: 2px;
+}
+.cover-subtitle {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+  color: rgba(237,231,217,.65); margin-bottom: 2.8rem;
+}
+.cover-author {
+  font-size: .9rem; font-weight: 300; letter-spacing: .06em;
+  color: rgba(237,231,217,.5);
+}
+
+/* ============================================================
+   CONTENT SLIDES — layout
+   ============================================================ */
+.slide-content {
+  background: var(--bg-page);
+  padding-bottom: 52px; /* nav height */
+}
+/* left accent bar driven by color modifier */
+.slide-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .95rem 2.4rem;
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+  flex-shrink: 0;
+}
+.slide-header.moore  { border-left: 5px solid var(--col-moore); }
+.slide-header.cadena { border-left: 5px solid var(--col-cadena); }
+.slide-header.compare{ border-left: 5px solid var(--col-compare); }
+.slide-header.refs   { border-left: 5px solid var(--col-refs); }
+
+.chip {
+  font-size: .63rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; padding: .2rem .7rem;
+  border-radius: 3px; color: #fff; flex-shrink: 0;
+}
+.chip.moore  { background: var(--col-moore); }
+.chip.cadena { background: var(--col-cadena); }
+.chip.compare{ background: var(--col-compare); }
+.chip.refs   { background: var(--col-refs); }
+
+.slide-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.55rem); font-weight: 600;
+  color: var(--txt-main); line-height: 1.2;
+}
+
+.slide-body {
+  flex: 1; overflow-y: auto;
+  padding: 1.3rem 2.4rem;
+  display: grid; gap: .85rem;
+  align-content: start;
+}
+.slide-body::-webkit-scrollbar { width: 4px; }
+.slide-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); border-radius: 2px; }
+
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g32 { grid-template-columns: 3fr 2fr; }
+.full { grid-column: 1 / -1; }
+
+/* ============================================================
+   THESIS BOX
+   ============================================================ */
+.thesis {
+  border-radius: 6px; padding: 1.1rem 1.5rem;
+  border-left: 5px solid;
+}
+.thesis.moore  { background: #2A1812; border-color: var(--col-moore); color: #EDD8CC; }
+.thesis.cadena { background: #0E2219; border-color: var(--col-cadena); color: #C8E0D5; }
+.thesis .t-label {
+  font-size: .62rem; font-weight: 600; letter-spacing: .22em;
+  text-transform: uppercase; opacity: .55; margin-bottom: .4rem;
+}
+.thesis .t-text {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: .88rem; line-height: 1.65;
+}
+
+/* ============================================================
+   CONTENT CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid rgba(0,0,0,.07);
+  border-radius: 6px; padding: 1.1rem 1.3rem;
+  border-top: 3px solid;
+}
+.card.moore  { border-top-color: var(--col-moore); }
+.card.cadena { border-top-color: var(--col-cadena); }
+.card.compare{ border-top-color: var(--col-compare); }
+.card.refs-c { border-top-color: var(--col-refs); }
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem; font-weight: 700; margin-bottom: .55rem;
+}
+.card-title.moore  { color: var(--col-moore); }
+.card-title.cadena { color: var(--col-cadena); }
+.card-title.compare{ color: var(--col-compare); }
+.card-title.refs-c { color: var(--col-refs); }
+
+.card p { font-size: .78rem; line-height: 1.58; color: var(--txt-sub); margin-bottom: .35rem; }
+.card p:last-child { margin-bottom: 0; }
+.card strong { color: var(--txt-main); font-weight: 600; }
+.card em { font-style: italic; }
+
+.card ul { list-style: none; padding: 0; }
+.card ul li {
+  font-size: .77rem; line-height: 1.5; color: var(--txt-sub);
+  padding-left: 1.05rem; position: relative; margin-bottom: .22rem;
+}
+.card ul li::before {
+  content: '→'; position: absolute; left: 0;
+  font-weight: 600; opacity: .45; font-size: .7rem; top: .12em;
+}
+.card ul li.sub {
+  padding-left: 1.9rem; font-size: .74rem; opacity: .85;
+}
+.card ul li.sub::before { content: '·'; left: .9rem; }
+
+.sec-label {
+  font-size: .63rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--txt-dim);
+  margin-top: .65rem; margin-bottom: .25rem;
+}
+
+/* ============================================================
+   COMPARISON TABLE — Slide 6
+   ============================================================ */
+.cmp-table-wrap {
+  overflow-x: auto; border-radius: 6px;
+  background: var(--bg-card); border: 1px solid rgba(0,0,0,.07);
+  grid-column: 1 / -1;
+}
+table.cmp {
+  width: 100%; border-collapse: collapse; font-size: .75rem;
+}
+table.cmp thead tr {
+  background: rgba(0,0,0,.04);
+}
+table.cmp th {
+  padding: .65rem 1rem; text-align: left;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .85rem; font-weight: 700;
+  border-bottom: 2px solid rgba(0,0,0,.08);
+}
+table.cmp th:nth-child(1) { color: var(--txt-dim); width: 18%; }
+table.cmp th:nth-child(2) { color: var(--col-moore); width: 26%; }
+table.cmp th:nth-child(3) { color: var(--col-cadena); width: 26%; }
+table.cmp th:nth-child(4) { color: var(--col-compare); width: 30%; }
+table.cmp td {
+  padding: .55rem 1rem; vertical-align: top; color: var(--txt-sub);
+  border-bottom: 1px solid rgba(0,0,0,.05); line-height: 1.45;
+}
+table.cmp td:first-child {
+  font-weight: 600; color: var(--txt-main); font-size: .78rem;
+}
+table.cmp tr:nth-child(even) td { background: rgba(0,0,0,.02); }
+table.cmp .tag-c { color: var(--col-cadena); font-style: italic; }
+table.cmp .tag-d { color: #A08060; font-style: italic; }
+table.cmp .tag-x { color: var(--col-compare); font-style: italic; }
+
+/* ============================================================
+   REFERENCES SLIDE — dark
+   ============================================================ */
+.slide-refs {
+  background: #111927; padding-bottom: 52px;
+}
+.slide-refs .slide-header {
+  background: rgba(255,255,255,.06);
+  border-bottom-color: rgba(255,255,255,.08);
+}
+.slide-refs .slide-title { color: #EDE7D9; }
+.slide-refs .slide-body  { background: transparent; }
+
+.ref-card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 6px; border-top: 3px solid;
+  padding: 1.2rem 1.5rem;
+}
+.ref-card.moore  { border-top-color: var(--col-moore); }
+.ref-card.cadena { border-top-color: var(--col-cadena); }
+.ref-author {
+  font-family: 'Cormorant Garamond', serif; font-weight: 700;
+  font-size: .95rem; margin-bottom: .5rem;
+}
+.ref-author.moore  { color: #D4855A; }
+.ref-author.cadena { color: #6DB894; }
+.ref-body {
+  font-size: .8rem; line-height: 1.7; color: rgba(237,231,217,.65);
+}
+.ref-body em { font-style: italic; color: rgba(237,231,217,.85); }
+.ref-body a  { color: rgba(237,231,217,.45); word-break: break-all; }
+.ref-note {
+  font-size: .72rem; color: rgba(237,231,217,.35);
+  margin-top: .6rem; line-height: 1.45;
+}
+
+/* ============================================================
+   NAVIGATION BAR
+   ============================================================ */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 52px; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem;
+  background: rgba(11,16,24,.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.nav-btn {
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.13);
+  color: rgba(255,255,255,.65);
+  border-radius: 5px; cursor: pointer;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; line-height: 1;
+  transition: background .18s, color .18s;
+  user-select: none;
+}
+.nav-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+.nav-btn:disabled { opacity: .3; cursor: not-allowed; }
+.dots { display: flex; gap: 5px; align-items: center; }
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.22); cursor: pointer;
+  transition: all .22s; flex-shrink: 0;
+}
+.dot.active {
+  width: 22px; border-radius: 4px;
+  background: rgba(255,255,255,.88);
+}
+.dot:hover:not(.active) { background: rgba(255,255,255,.45); }
+.nav-counter {
+  font-size: .68rem; color: rgba(255,255,255,.3);
+  min-width: 36px; text-align: center; font-variant-numeric: tabular-nums;
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     DECK
+     ════════════════════════════════════════════════════════ -->
+<div class="deck" id="deck">
+
+<!-- ─── SLIDE 1 · COVER ───────────────────────────────── -->
+<section class="slide slide-cover active" data-idx="0">
+  <div class="cover-inner">
+    <p class="cover-course">SOL316 &nbsp;·&nbsp; Sociedad, Naturaleza y Tecnología</p>
+    <h1 class="cover-title">Tutoría Seminario 8</h1>
+    <div class="cover-bar"></div>
+    <p class="cover-subtitle">Moore (2016) &nbsp;·&nbsp; de la Cadena (2020)</p>
+    <p class="cover-author">Vicente Mühlenbrock</p>
+  </div>
+</section>
+
+<!-- ─── SLIDE 2 · MOORE — TESIS Y ESTRUCTURA ─────────── -->
+<section class="slide slide-content" data-idx="1">
+  <header class="slide-header moore">
+    <span class="chip moore">Moore (2016)</span>
+    <h2 class="slide-title">El fin de la naturaleza barata</h2>
+  </header>
+  <div class="slide-body g3">
+
+    <!-- Thesis: full width -->
+    <div class="thesis moore full">
+      <p class="t-label">Tesis central</p>
+      <p class="t-text">El capitalismo actual ha <strong>agotado la relación histórica que produce naturaleza barata</strong>. El fin de la naturaleza barata no es la reasertación de "límites externos al crecimiento", sino el agotamiento de las relaciones de valor que restauraron periódicamente los <em>Four Cheaps</em>: trabajo, alimentos, energía y materias primas. El límite de la ecología-mundo del capital es el capital en sí mismo.</p>
+    </div>
+
+    <!-- Card 1: Oikeios -->
+    <div class="card moore">
+      <p class="card-title moore">Capitalismo y oikeios</p>
+      <p>El capitalismo se desarrolla <em>en y a través del</em> <strong>oikeios</strong>: la relación creativa, generativa y multicapa entre especies y medioambiente.</p>
+      <ul>
+        <li>Los humanos son simultáneamente <strong>productores y productos</strong> de su medioambiente</li>
+        <li>Las civilizaciones son coproducidas con el resto de la naturaleza</li>
+        <li>Bienestar de los cuerpos y el medioambiente: dialécticamente unidos</li>
+      </ul>
+    </div>
+
+    <!-- Card 2: Capitalismo-naturaleza-trabajo -->
+    <div class="card moore">
+      <p class="card-title moore">Capitalismo, naturaleza y trabajo no remunerado</p>
+      <p class="sec-label">Producción de naturaleza</p>
+      <p>La naturaleza no es un objeto preformado para el capital, sino una <strong>red de relaciones que el capital reformula</strong> para avanzar en la contribución del trabajo biosférico no remunerado.</p>
+      <p class="sec-label">Mano de obra barata</p>
+      <p>Apropiación del <strong>trabajo no remunerado</strong>: humanos (mujeres, esclavos) y extra-humanos (bosques, suelos, ríos). Dialéctica entre capitalización (explotación) y apropiación (no-mercantilización).</p>
+    </div>
+
+    <!-- Card 3: Four Cheaps + Crisis -->
+    <div class="card moore">
+      <p class="card-title moore">Four Cheaps</p>
+      <ul>
+        <li><strong>Trabajo</strong>, <strong>alimentos</strong>, <strong>energía</strong> y <strong>materias primas</strong> históricamente baratos</li>
+        <li>Producidos mediante la extensión de <em>fronteras</em> a espacios no mercantilizados</li>
+        <li>Su restauración cíclica resuelve las crisis de sobreacumulación</li>
+      </ul>
+      <p class="sec-label">Crisis del capitalismo</p>
+      <p><strong>Crisis históricas:</strong> resueltas abriendo nuevas fronteras (naturaleza externa).</p>
+      <p><strong>Crisis neoliberal:</strong> desde 2003 el excedente ecológico cae; las grandes fronteras se agotan; los Four Cheaps dejan de ser baratos. Crisis de <em>época</em>, no solo de desarrollo.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SLIDE 3 · MOORE — CONCEPTOS CLAVE ────────────── -->
+<section class="slide slide-content" data-idx="2">
+  <header class="slide-header moore">
+    <span class="chip moore">Moore (2016)</span>
+    <h2 class="slide-title">Conceptos clave</h2>
+  </header>
+  <div class="slide-body g3">
+
+    <!-- Capitaloceno -->
+    <div class="card moore">
+      <p class="card-title moore">Capitaloceno vs. Antropoceno</p>
+      <p><strong>Antropoceno:</strong> la humanidad como causa genérica y unitaria del impacto planetario. Moore rechaza esta "ficticia unidad humana".</p>
+      <p><strong>Capitaloceno:</strong> el problema está en las <strong>relaciones del capital y el poder capitalista</strong>, no en el Anthropos abstracto. Ubica los orígenes en el largo siglo XVI (1450–1648) y en la estrategia de construir la naturaleza como algo externo.</p>
+    </div>
+
+    <!-- Naturalezas extra-humanas -->
+    <div class="card moore">
+      <p class="card-title moore">Naturalezas extra-humanas</p>
+      <p>Todos los componentes del medioambiente ajenos a la condición humana: <strong>bosques, suelos, ríos, microorganismos, clima</strong>.</p>
+      <p>No son un mero telón de fondo sino <strong>coproductoras activas</strong> del capitalismo histórico. El bienestar de los cuerpos y el medioambiente están dialécticamente unidos.</p>
+    </div>
+
+    <!-- Valor / No-valor -->
+    <div class="card moore">
+      <p class="card-title moore">Valor como método · Valor como proposición · No-valor</p>
+      <p><strong>Valor como método:</strong> reconstruye el capitalismo histórico a través de "la producción y reproducción de la vida real"; disuelve la separación economía/ecología.</p>
+      <p><strong>Valor como proposición:</strong> proyecto histórico que reduce la realidad a porciones intercambiables; opera mediante la dialéctica <em>capitalización / apropiación</em>.</p>
+      <p><strong>No-valor:</strong> zona de apropiación del trabajo no remunerado (naturaleza humana y extra-humana); condición necesaria para que opere el valor.</p>
+    </div>
+
+    <!-- Naturaleza social abstracta -->
+    <div class="card moore">
+      <p class="card-title moore">Naturaleza social abstracta · Capitalismo como frontera</p>
+      <p><strong>Naturaleza social abstracta:</strong> configuraciones históricamente específicas de la naturaleza, coproducidas por el capital, el poder y el conocimiento burgués. El capitalismo representa el tiempo como lineal, el espacio como plano y la naturaleza como externa.</p>
+      <p><strong>Capitalismo como frontera:</strong> la extensión del poder capitalista a nuevos espacios no mercantilizados fue la "savia" del sistema desde el siglo XVI.</p>
+    </div>
+
+    <!-- Agotamiento -->
+    <div class="card moore">
+      <p class="card-title moore">Agotamiento</p>
+      <p>No es solo el deterioro físico de materias primas, sino el <strong>agotamiento de las estrategias de acumulación</strong> históricamente específicas que reproducen los Four Cheaps.</p>
+      <p>Se expresa en el aumento de precios del trabajo, alimentos, energía y materias primas; en problemas de salud, fertilidad y bienestar de la clase trabajadora. Tendencia a la <em>caída del excedente ecológico</em>.</p>
+    </div>
+
+    <!-- Contabilidad planetaria + Cuantismo -->
+    <div class="card moore">
+      <p class="card-title moore">Contabilidad planetaria (Luke) · Cuantismo</p>
+      <p><strong>Contabilidad planetaria (Timothy Luke):</strong> crítica a las formas de cuantificación y racionalización del medioambiente bajo el capitalismo; modo en que el Estado y el capital representan la naturaleza como entidad mensurable y administrable.</p>
+      <p><strong>Cuantismo:</strong> tendencia del capital a reducir la naturaleza a cantidades abstractas e intercambiables; expresión material de la naturaleza social abstracta y de la ley del valor operando como campo gravitacional.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SLIDE 4 · DE LA CADENA — TESIS ───────────────── -->
+<section class="slide slide-content" data-idx="3">
+  <header class="slide-header cadena">
+    <span class="chip cadena">de la Cadena (2020)</span>
+    <h2 class="slide-title">Cosmopolítica indígena en los Andes</h2>
+  </header>
+  <div class="slide-body g2">
+
+    <!-- Thesis -->
+    <div class="thesis cadena full">
+      <p class="t-label">Tesis central (triple)</p>
+      <p class="t-text">
+        <strong style="color:#6DB894">(1)</strong> La indigeneidad, como formación histórica, <strong>excede la noción de política "como de costumbre"</strong> —un espacio habitado sólo por seres humanos racionales—.
+        <strong style="color:#6DB894"> (2)</strong> Los movimientos indígenas actuales <strong>desafían la separación naturaleza/cultura</strong> que sostiene la política moderna.
+        <strong style="color:#6DB894"> (3)</strong> Proponen una práctica política diferente, plural porque <strong>invoca no-humanos como actores</strong> en la arena política.
+      </p>
+    </div>
+
+    <!-- Más allá de la modernidad -->
+    <div class="card cadena">
+      <p class="card-title cadena">Entendimientos del mundo más allá de la modernidad</p>
+      <p>La constitución moderna (Latour) separó la <strong>representación de la naturaleza</strong> (ciencia) de la <strong>representación de los ciudadanos</strong> (política). Los seres-tierra irrumpen en la política perturbando esta separación onto-epistémica.</p>
+      <ul>
+        <li>La indigeneidad siempre fue parte de la modernidad, pero nunca <em>modernista</em></li>
+        <li>Las prácticas-tierra no desaparecieron en 500 años de colonización</li>
+        <li>La Constitución ecuatoriana de 2008: Pachamama con derechos → caso paradigmático</li>
+      </ul>
+    </div>
+
+    <!-- Dimensiones políticas -->
+    <div class="card cadena">
+      <p class="card-title cadena">Dimensiones políticas del conflicto entre mundos</p>
+      <p class="sec-label">Lo político (Mouffe/Schmitt)</p>
+      <p><strong>Lo político:</strong> antagonismo entre amigos y enemigos; no reducible a ética, estética o economía. <strong>La política:</strong> prácticas que hacen habitable el antagonismo sin anular el conflicto.</p>
+      <p class="sec-label">Cosmopolítica (Stengers)</p>
+      <p>Propuesta que "desacelera el razonamiento" para abrir espacio a actores habitualmente no convocados; invita a tomar en serio la presencia política de entidades no humanas.</p>
+    </div>
+
+    <!-- Biopoder hegemónico -->
+    <div class="card cadena">
+      <p class="card-title cadena">Biopoder hegemónico (p. 286)</p>
+      <p>El Estado moderno administra la indigeneidad a través de tecnologías culturales de <strong>inclusión/exclusión</strong>: alfabetización, urbanización y mestizaje como formas de "dejar morir a los indios".</p>
+      <ul>
+        <li>La inclusión política exige subordinar las prácticas indígenas a la gramática de la política "como de costumbre"</li>
+        <li>El "indio permitido" (Rivera): condiciones liberales e izquierdistas para la participación política</li>
+      </ul>
+    </div>
+
+    <!-- Oposición ontológica -->
+    <div class="card cadena">
+      <p class="card-title cadena">Oposición ontológica</p>
+      <p>Los seres-tierra desafían el <strong>orden ontológico moderno</strong> (naturaleza separada de humanidad) que sostiene tanto el biopoder hegemónico como la política "como de costumbre".</p>
+      <ul>
+        <li>La constitución de la naturaleza como ontológicamente distinta está en el corazón del antagonismo que excluye las "creencias indígenas" de la política convencional</li>
+        <li>La diferencia indígena es <em>ontológica</em>, no meramente cultural o ideológica</li>
+        <li>El conflicto no es entre dos culturas, sino entre <strong>mundos socionaturales</strong></li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SLIDE 5 · DE LA CADENA — CONCEPTOS ───────────── -->
+<section class="slide slide-content" data-idx="4">
+  <header class="slide-header cadena">
+    <span class="chip cadena">de la Cadena (2020)</span>
+    <h2 class="slide-title">Conceptos clave</h2>
+  </header>
+  <div class="slide-body g3">
+
+    <!-- Tirakuna -->
+    <div class="card cadena">
+      <p class="card-title cadena">Tirakuna / seres-tierra · prácticas-tierra</p>
+      <p><strong>Tirakuna:</strong> plural quechuizado de "tierra"; entidades sensibles con fisonomías individuales — montañas, ríos, lagunas, rocas. <em>Ausangate</em>, <em>Quilish</em> como casos emblemáticos.</p>
+      <p><strong>Prácticas-tierra:</strong> relaciones de respeto y afecto entre humanos y personas no humanas; condición de la vida en los Andes.</p>
+      <p><strong>Importancia:</strong> actores políticos emergentes; su presencia en la arena pública desaprueba la separación Naturaleza/Humanidad que sostiene la política moderna.</p>
+    </div>
+
+    <!-- Pampamisayoq -->
+    <div class="card cadena">
+      <p class="card-title cadena">Pampamisayoq</p>
+      <p>Persona con capacidad especial de <strong>interactuar con los seres-tierra</strong> (apus, montañas, pampas). Figura central en las comunidades quechuas andinas.</p>
+      <p><strong>Mariano Turpo</strong> (padre) y <strong>Nazario Turpo</strong> (hijo) son el caso etnográfico central del artículo. Ambos ejercieron activismo político y práctica ritual de manera inseparable, articulando mundos que la modernidad mantiene separados.</p>
+    </div>
+
+    <!-- Conexiones parciales -->
+    <div class="card cadena">
+      <p class="card-title cadena">Conexiones parciales (Strathern)</p>
+      <p>Relación que produce un agregado <strong>"más de uno, pero menos de dos"</strong> — ni fusión ni separación completa.</p>
+      <p class="sec-label">Indígena-mestizo como conexión parcial</p>
+      <p>La indigeneidad andina: formación fractal, sin cierre posible; ni indígena puro ni mestizo. Siempre parte del otro.</p>
+      <p class="sec-label">Cultura, naturaleza y seres-tierra</p>
+      <p>Cuando los movimientos indígenas invocan la "cultura", esta puede incluir lo que occidente llama naturaleza y a los seres-tierra — conexión parcial con el vocabulario moderno.</p>
+    </div>
+
+    <!-- Equivocaciones -->
+    <div class="card cadena">
+      <p class="card-title cadena">Equivocaciones (Viveiros de Castro)</p>
+      <p>No es el fracaso de la comprensión, sino la <strong>falla en comprender que los entendimientos no son iguales</strong> y refieren a mundos reales distintos, no a perspectivas sobre un mismo mundo.</p>
+      <p class="sec-label">¿Qué permiten?</p>
+      <ul>
+        <li>"Tierra" como equivocación que permitió la alianza campesinos-izquierdistas en la reforma agraria peruana</li>
+        <li>"Medio ambiente" como equivocación que articula ambientalistas e indígenas en conflictos mineros</li>
+        <li>Posibilitan alianzas parciales <strong>sin disolver la diferencia ontológica</strong></li>
+        <li>Su "control" (no corrección) permite visibilizar conflictos entre mundos</li>
+      </ul>
+    </div>
+
+    <!-- Ayllu -->
+    <div class="card cadena">
+      <p class="card-title cadena">Ayllu</p>
+      <p>Palabra quechua; comunidad como <strong>espacio dinámico donde viven todos los seres</strong>: humanos, plantas, animales, montañas, ríos, lluvia.</p>
+      <p><em>"No soy de Huantura, soy Huantura"</em> (Oxa, 2004): el lugar no es de donde se es, sino lo que se es.</p>
+      <p>Mariano Turpo luchó por recuperar <em>ayllu</em> — en su significado relacional — mientras sus aliados izquierdistas entendían "tierra" en términos de reforma agraria: equivocación productiva que hizo posible el evento histórico.</p>
+    </div>
+
+    <!-- Uyway -->
+    <div class="card cadena">
+      <p class="card-title cadena">Uyway</p>
+      <p>Quechua: "criar hijos, hacer crecer plantas y animales". En la práctica cotidiana: <strong>relaciones mutuas de cuidado</strong> entre personas humanas y no humanas.</p>
+      <p><em>"Pachamama nos nutre, los apus nos nutren. Nutrimos las semillas, los animales y las plantas, y ellos también nos nutren"</em> (Oxa, 2004).</p>
+      <p>Uyway motivó la lucha de Mariano Turpo: recuperar la capacidad de cuidar y ser cuidado por el territorio (seres-tierra, animales, cultivos). La hacienda imposibilitaba esas relaciones.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── SLIDE 6 · CRUCES Y DIVERGENCIAS ──────────────── -->
+<section class="slide slide-content" data-idx="5">
+  <header class="slide-header compare">
+    <span class="chip compare">Síntesis comparativa</span>
+    <h2 class="slide-title">Moore (2016) y de la Cadena (2020): Cruces y divergencias</h2>
+  </header>
+  <div class="slide-body">
+    <div class="cmp-table-wrap">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th>Dimensión</th>
+            <th>Moore (2016)</th>
+            <th>de la Cadena (2020)</th>
+            <th>Cruce / Divergencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Relación naturaleza/sociedad</td>
+            <td>Unidad dialéctica coproducida; rechaza la separación cartesiana. El capitalismo <em>produce</em> naturaleza.</td>
+            <td>La separación naturaleza/cultura es una invención moderna que excluye a los seres-tierra de la política.</td>
+            <td><span class="tag-x">✕ Cruce central:</span> ambos critican el dualismo moderno naturaleza/sociedad desde ángulos distintos.</td>
+          </tr>
+          <tr>
+            <td>Rol de lo no-humano</td>
+            <td>Las naturalezas extra-humanas (bosques, suelos, clima) son coproductoras del capitalismo; trabajo no remunerado.</td>
+            <td>Los seres-tierra (tirakuna) son actores políticos con agencia propia; su existencia desafía la ontología moderna.</td>
+            <td><span class="tag-x">✕ Cruce:</span> ambos otorgan agencia activa a lo no-humano. <span class="tag-d">Divergencia:</span> Moore en clave económico-ecológica; de la Cadena en clave ontológico-política.</td>
+          </tr>
+          <tr>
+            <td>Capitalismo / neoliberalismo</td>
+            <td>Motor de la crisis: agota las relaciones que producen naturaleza barata; crisis epocal desde 2003.</td>
+            <td>El neoliberalismo amplía concesiones mineras, amenaza a los seres-tierra y cataliza la emergencia pública de la indigeneidad.</td>
+            <td><span class="tag-x">✕ Cruce:</span> coinciden en el papel del capitalismo neoliberal como destructor de relaciones socionaturales.</td>
+          </tr>
+          <tr>
+            <td>Escala / objeto de análisis</td>
+            <td>Macro: sistema-mundo moderno, larga duración histórica (1450–presente).</td>
+            <td>Micro/local: comunidades quechuas andinas (Pacchanta, Ocongate); escala etnográfica.</td>
+            <td><span class="tag-d">Divergencia:</span> Moore construye una teoría sistémica global; de la Cadena parte de casos situados para formular conceptos cosmopolíticos.</td>
+          </tr>
+          <tr>
+            <td>Ontología</td>
+            <td>Ontología materialista histórica: la realidad es una, producida dialécticamente por capital-poder-naturaleza.</td>
+            <td>Ontología múltiple / pluriverso: existen mundos socionaturales diferentes, irreductibles entre sí.</td>
+            <td><span class="tag-d">Divergencia clave:</span> Moore mantiene un monismo ecológico-marxista; de la Cadena apuesta por el pluriverso ontológico.</td>
+          </tr>
+          <tr>
+            <td>Sujeto político</td>
+            <td>Clases sociales en el sistema-mundo; lucha de clases ampliada (también en la zona de apropiación).</td>
+            <td>Comunidades indígenas parcialmente conectadas + seres-tierra como actores políticos no humanos.</td>
+            <td><span class="tag-d">Divergencia:</span> Moore privilegia la clase; de la Cadena pluraliza el sujeto político hacia lo no-humano.</td>
+          </tr>
+          <tr>
+            <td>Metodología</td>
+            <td>Ecología-mundo: análisis sistémico, histórico-comparado, economía política.</td>
+            <td>Etnografía de inspiración conceptual; caso andino para la reflexión cosmopolítica.</td>
+            <td><span class="tag-d">Divergencia:</span> escalas y métodos complementarios que se pueden articular productivamente.</td>
+          </tr>
+          <tr>
+            <td>Temporalidad</td>
+            <td>Longue durée; ciclos de acumulación y crisis desde el siglo XVI.</td>
+            <td>Presente de emergencia política indígena; genealogía de la constitución moderna de lo político.</td>
+            <td><span class="tag-c">Posible articulación:</span> los ciclos de Moore explican el contexto estructural de la emergencia que documenta de la Cadena.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SLIDE 7 · REFERENCIAS ─────────────────────────── -->
+<section class="slide slide-refs" data-idx="6">
+  <header class="slide-header refs">
+    <span class="chip refs">Referencias</span>
+    <h2 class="slide-title">Bibliografía APA 7</h2>
+  </header>
+  <div class="slide-body g2">
+
+    <div class="ref-card moore">
+      <p class="ref-author moore">Moore, Jason W.</p>
+      <p class="ref-body">
+        Moore, J. W. (2016). El fin de la naturaleza barata: o cómo aprendí a dejar de preocuparme
+        por «el» medioambiente y amar la crisis del capitalismo. <em>Relaciones Internacionales</em>,
+        (33), 143–174.
+        <br><a href="https://doi.org/10.15366/relacionesinternacionales2016.33.007" target="_blank">
+          https://doi.org/10.15366/relacionesinternacionales2016.33.007
+        </a>
+      </p>
+      <p class="ref-note">
+        Traducción al español del capítulo original: "The End of Cheap Nature. Or How I Learned
+        to Stop Worrying about 'The' Environment and Love the Crisis of Capitalism" (2014).
+        En C. Suter &amp; C. Chase-Dunn (Eds.), <em>Structures of the World Political Economy
+        and the Future of Global Conflict and Cooperation</em> (pp. 285–314). LIT.
+      </p>
+    </div>
+
+    <div class="ref-card cadena">
+      <p class="ref-author cadena">De la Cadena, Marisol</p>
+      <p class="ref-body">
+        De la Cadena, M. (2020). Cosmopolítica indígena en los Andes: reflexiones conceptuales
+        más allá de la «política». <em>Tabula Rasa</em>, (33), 273–311.
+        <br><a href="https://doi.org/10.25058/20112742.n33.10" target="_blank">
+          https://doi.org/10.25058/20112742.n33.10
+        </a>
+      </p>
+      <p class="ref-note">
+        Versión en español del artículo original: "Indigenous Cosmopolitics in the Andes:
+        Conceptual Reflections beyond Politics" (2010). <em>Cultural Anthropology</em>,
+        <em>25</em>(2), 334–370. Traducción de Cristóbal Gnecco.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<!-- ════════════════════════════════════════════════════════
+     NAVIGATION BAR
+     ════════════════════════════════════════════════════════ -->
+<nav class="nav-bar">
+  <button class="nav-btn" id="btnPrev" onclick="go(-1)" title="Anterior (←)">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="btnNext" onclick="go(1)" title="Siguiente (→)">&#8594;</button>
+  <span class="nav-counter" id="counter"></span>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+     SCRIPT — navigation
+     ════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  const slides  = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl  = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const total   = slides.length;
+  let current   = 0;
+
+  /* Build dots */
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    if (n < 0 || n >= total || n === current) return;
+    const prev = current;
+    slides[prev].classList.remove('active');
+    slides[prev].classList.add('exit');
+    setTimeout(() => slides[prev].classList.remove('exit'), 500);
+
+    current = n;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  function go(dir) { goTo(current + dir); }
+  window.go = go;
+
+  function updateUI() {
+    const allDots = dotsEl.querySelectorAll('.dot');
+    allDots.forEach((d, i) => d.classList.toggle('active', i === current));
+    counter.textContent = (current + 1) + ' / ' + total;
+    btnPrev.disabled = (current === 0);
+    btnNext.disabled = (current === total - 1);
+  }
+
+  /* Keyboard */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    go(-1);
+    if (e.key === 'Home') goTo(0);
+    if (e.key === 'End')  goTo(total - 1);
+  });
+
+  /* Touch swipe */
+  let touchX = null;
+  document.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend',   (e) => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  });
+
+  updateUI();
+})();
+</script>
+</body>
+</html>
