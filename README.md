@@ -17,4 +17,4 @@ A continuación se presenta todo el material respectivo a los seminarios y tutor
 | 5 | Javier Naranjo | miércoles 13 de mayo | viernes 8 de mayo, 15:00h | [`[Pres]`](https://rawcdn.githack.com/vmuhlenbrock/Tutorias-SOL316/b48006281b614eaf9d96accc1afdc335b260d222/Presentaciones/Tutori%CC%81a_Seminario5.html) |
 | 6 | Cristóbal Moreno | miércoles 27 de mayo | viernes 15 de mayo, 15:00h | [`[Pres]`](https://rawcdn.githack.com/vmuhlenbrock/Tutorias-SOL316/dfa19a24cda22c79688ef9bc5e7ea73a05c773b2/Presentaciones/Tutori%CC%81a_Seminario6.html) |
 | 7 | Gabriel Bravo y Bruno Mercado | miércoles 17 de junio | viernes 12 de junio |  |
-| 8 | Sofía Candia, Catalina Solís y Camila Vidal | lunes 22 de junio | viernes 19 de junio, 15:00h |  |
+| 8 | Sofía Candia, Catalina Solís y Camila Vidal | lunes 22 de junio | viernes 19 de junio, 15:00h | [`[Pres]`](https://rawcdn.githack.com/vmuhlenbrock/Tutorias-SOL316/988b42567b661aed4bc6b73c8ab21b76015b5e50/Presentaciones/Tutori%CC%81a_Seminario8.html) |
