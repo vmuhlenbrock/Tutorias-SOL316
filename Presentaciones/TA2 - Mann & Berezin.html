@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOL119 Ayudantía 2: Mann (1984) y Berezin et al (2020)</title>
+<style>
+
+:root {
+  --bg: #0f1115;
+  --panel: #161923;
+  --panel-2: #1c2030;
+  --ink: #f3f4f7;
+  --ink-dim: #b9bdc9;
+  --ink-faint: #7b8094;
+  --line: #2a2f42;
+  --mann: #d1495b;
+  --mann-soft: rgba(209, 73, 91, 0.14);
+  --berezin: #4f8fd6;
+  --berezin-soft: rgba(79, 143, 214, 0.14);
+  --neutral: #d9b25a;
+  --neutral-soft: rgba(217, 178, 90, 0.14);
+  --accent: var(--neutral);
+  --accent-soft: var(--neutral-soft);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  overflow: hidden;
+}
+
+.deck {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(20px, 3.6vw, 60px) clamp(32px, 7vw, 130px);
+}
+
+.slide.active { display: flex; }
+
+.slide[data-accent="mann"]    { --accent: var(--mann);    --accent-soft: var(--mann-soft); }
+.slide[data-accent="berezin"] { --accent: var(--berezin); --accent-soft: var(--berezin-soft); }
+.slide[data-accent="neutral"] { --accent: var(--neutral); --accent-soft: var(--neutral-soft); }
+
+/* ---------- portada ---------- */
+.cover { align-items: flex-start; justify-content: center; }
+.cover .kicker {
+  font-size: clamp(13px, 1.1vw, 16px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 22px;
+}
+.cover h1 {
+  font-size: clamp(30px, 4.4vw, 58px);
+  line-height: 1.18;
+  font-weight: 700;
+  margin: 0 0 30px 0;
+  max-width: 20ch;
+  letter-spacing: -0.01em;
+}
+.cover .author {
+  font-size: clamp(16px, 1.6vw, 22px);
+  color: var(--ink-dim);
+  font-weight: 400;
+}
+.cover .rule {
+  width: 64px;
+  height: 4px;
+  background: var(--neutral);
+  border-radius: 2px;
+  margin-top: 34px;
+}
+
+/* ---------- encabezado común de slides de contenido ---------- */
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: clamp(10px, 1.6vw, 16px);
+}
+.eyebrow {
+  font-size: clamp(12px, 1vw, 14px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.time-badge {
+  font-size: 12px;
+  color: var(--ink-faint);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+h2.headline {
+  font-size: clamp(20px, 2.35vw, 32px);
+  line-height: 1.26;
+  font-weight: 700;
+  max-width: 32ch;
+  margin: 0 0 clamp(14px, 2vw, 22px) 0;
+  letter-spacing: -0.005em;
+}
+
+.body-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(24px, 3.4vw, 48px);
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+.body-grid.no-visual { grid-template-columns: 1fr; }
+
+ul.bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.15vw, 13px);
+}
+ul.bullets li {
+  position: relative;
+  padding-left: 24px;
+  font-size: clamp(13.5px, 1.15vw, 16.5px);
+  line-height: 1.42;
+  color: var(--ink-dim);
+}
+ul.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+ul.bullets li strong { color: var(--ink); font-weight: 650; }
+
+.visual-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+svg.diagram { width: 100%; height: auto; max-height: 40vh; }
+.diagram .box { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
+.diagram .box-a { stroke: var(--accent); }
+.diagram .box-b { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram .box-warn { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.diagram .box-title { fill: var(--ink); font-size: 16px; font-weight: 700; }
+.diagram .box-title-sm { fill: var(--ink); font-size: 13.5px; font-weight: 700; }
+.diagram .box-title-xs { fill: var(--ink); font-size: 12px; font-weight: 700; }
+.diagram .box-sub { fill: var(--ink-faint); font-size: 12px; }
+.diagram .edge-label { fill: var(--ink-faint); font-size: 12px; }
+.diagram .flow-step { fill: var(--ink-dim); font-size: 13px; font-weight: 600; }
+.diagram .flow-arrow { fill: var(--accent); font-size: 14px; }
+.diagram .divider { stroke: var(--line); stroke-width: 1; }
+.diagram .arrow, .diagram .arrow-curve {
+  fill: none; stroke: var(--accent); stroke-width: 2;
+  marker-end: url(#arrowhead);
+}
+.diagram .node { fill: var(--panel-2); stroke: var(--accent); stroke-width: 1.5; }
+.diagram .node-title { fill: var(--ink); font-size: 14px; font-weight: 700; }
+.diagram .node-sub { fill: var(--ink-faint); font-size: 11px; }
+.diagram .ring { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 5; }
+
+/* ---------- tabla de síntesis ---------- */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(13px, 1.15vw, 16px);
+}
+.compare-table th, .compare-table td {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.4;
+}
+.compare-table th {
+  color: var(--ink-faint);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.compare-table th:nth-child(2) { color: var(--mann); }
+.compare-table th:nth-child(3) { color: var(--berezin); }
+.compare-table td:first-child { color: var(--ink-faint); font-weight: 600; white-space: nowrap; }
+.compare-table td:nth-child(2) { color: var(--ink); border-left: 2px solid var(--mann-soft); }
+.compare-table td:nth-child(3) { color: var(--ink); border-left: 2px solid var(--berezin-soft); }
+
+/* ---------- caja de discusión ---------- */
+.discussion {
+  margin-top: clamp(10px, 1.6vw, 18px);
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 14px;
+  padding: clamp(10px, 1.3vw, 15px) clamp(14px, 1.7vw, 20px);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.discussion .bubble {
+  flex: none;
+  width: 22px; height: 22px;
+  margin-top: 2px;
+}
+.discussion .bubble svg { width: 100%; height: 100%; }
+.discussion .d-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+.discussion .d-label {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.discussion .d-format {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+.discussion .d-prompt {
+  font-size: clamp(13px, 1.15vw, 16px);
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* ---------- referencias ---------- */
+.references-list {
+  list-style: none;
+  margin: clamp(6px, 1vw, 10px) 0 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.6vw, 28px);
+}
+.references-list li {
+  padding-left: 2em;
+  text-indent: -2em;
+  font-size: clamp(14px, 1.3vw, 18px);
+  line-height: 1.6;
+  color: var(--ink);
+}
+.references-list .ref-doi {
+  display: block;
+  margin-top: 4px;
+  font-size: clamp(12px, 1vw, 14px);
+  color: var(--berezin);
+}
+.references-list .ref-note {
+  display: block;
+  margin-top: 3px;
+  font-size: clamp(11.5px, 0.95vw, 13px);
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ---------- chrome del deck ---------- */
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: var(--neutral);
+  width: 0%;
+  z-index: 20;
+  transition: width 0.25s ease;
+}
+.hud {
+  position: fixed;
+  bottom: 18px;
+  left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 20;
+  font-size: 12px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.hud .nav-btn {
+  pointer-events: auto;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  user-select: none;
+}
+.hud .nav-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+.hud .counter { min-width: 54px; text-align: center; }
+
+@media (max-width: 720px) {
+  .body-grid { grid-template-columns: 1fr; }
+  .visual-wrap { order: -1; }
+}
+
+@media print {
+  html, body { overflow: visible; height: auto; }
+  .hud, .progress { display: none; }
+  .slide {
+    display: flex !important;
+    position: relative;
+    page-break-after: always;
+    height: 100vh;
+  }
+}
+
+</style>
+</head>
+<body>
+  <div class="progress"></div>
+  <div class="deck">
+
+    <section class="slide cover" data-accent="neutral">
+      <div class="kicker">SOL119 · Sociología Política</div>
+      <h1>SOL119 Ayudantía 2: Mann (1984) y Berezin et al (2020)</h1>
+      <div class="author">Vicente Matías Mühlenbrock Leal</div>
+      <div class="rule"></div>
+    </section>
+
+    <section class="slide" data-accent="neutral">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Encuadre</span>
+        <span class="time-badge">⏱ 3 min</span>
+      </div>
+      <h2 class="headline">¿Qué explica al Estado: su organización, o su cultura?</h2>
+        <ul class="bullets">
+          <li><strong>Michael Mann (1984)</strong> — el poder autónomo del Estado: despótico e infraestructural.</li>
+          <li><strong>Berezin, Sandusky & Davidson (2020)</strong> — cultura política: Estado-nación, nacionalismo y práctica.</li>
+          <li>Síntesis comparativa: estructura y cultura como dos maneras de explicar la autonomía del Estado.</li>
+        </ul>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para partir</span>
+              <span class="d-format">Pregunta abierta a quienes leyeron y a quienes aún no</span>
+            </div>
+            <div class="d-prompt">Si yo les pidiera que definieran «el Estado» en una sola frase, ¿qué dirían?</div>
+          </div>
+        </div>
+    </section>
+
+    <section class="slide" data-accent="mann">
+      <div class="eyebrow-row">
+        <span class="eyebrow">MANN · 1984</span>
+        <span class="time-badge">⏱ 3 min</span>
+      </div>
+      <h2 class="headline">Ni la sociedad civil ni la fuerza militar explican al Estado: ambas lo reducen a otra cosa.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li><strong>Marxismo, pluralismo liberal, funcionalismo:</strong> el Estado es solo el escenario donde actúa la sociedad civil — no tiene poder propio.</li>
+          <li><strong>Tradición militarista (Gumplowicz, Schmitt):</strong> sí le da autonomía, pero lo reduce a pura fuerza militar cristalizada.</li>
+          <li>Ni los modelos «bidimensionales» (Skocpol, Tilly, Giddens) explican qué tiene el Estado de distintivo como organización.</li>
+        </ul>
+
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 220" class="diagram" role="img"
+         aria-label="Reduccionismo societal y militarista convergen en el mismo problema no resuelto">
+      <g font-family="inherit">
+        <rect x="20" y="20" width="220" height="86" rx="10" class="box box-a"/>
+        <text x="130" y="50" text-anchor="middle" class="box-title-sm">Reduccionismo societal</text>
+        <text x="130" y="72" text-anchor="middle" class="box-sub">marxismo, pluralismo,</text>
+        <text x="130" y="88" text-anchor="middle" class="box-sub">funcionalismo</text>
+
+        <rect x="400" y="20" width="220" height="86" rx="10" class="box box-a"/>
+        <text x="510" y="50" text-anchor="middle" class="box-title-sm">Reduccionismo militarista</text>
+        <text x="510" y="72" text-anchor="middle" class="box-sub">Estado = fuerza militar</text>
+        <text x="510" y="88" text-anchor="middle" class="box-sub">cristalizada</text>
+
+        <path d="M150,106 C180,150 260,168 300,170" class="arrow"/>
+        <path d="M490,106 C460,150 380,168 340,170" class="arrow"/>
+
+        <rect x="170" y="170" width="300" height="40" rx="8" class="box box-warn"/>
+        <text x="320" y="195" text-anchor="middle" class="box-title-sm">ninguno explica la autonomía del Estado</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="mann">
+      <div class="eyebrow-row">
+        <span class="eyebrow">MANN · 1984</span>
+        <span class="time-badge">⏱ 4 min</span>
+      </div>
+      <h2 class="headline">Poder despótico y poder infraestructural son ejes independientes, no una sola escala.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li><strong>Poder despótico:</strong> lo que la élite estatal puede hacer sin negociar rutinariamente con la sociedad civil.</li>
+          <li><strong>Poder infraestructural:</strong> la capacidad de penetrar la sociedad civil e implementar decisiones en todo el territorio.</li>
+          <li>Occidente hoy: despóticamente débil, infraestructuralmente fortísimo — dos ejes, no un solo termómetro de «poder».</li>
+        </ul>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para conversar</span>
+              <span class="d-format">Pregunta abierta al curso</span>
+            </div>
+            <div class="d-prompt">¿Dónde cae el Chile de 2026 en esta grilla? ¿Siempre estuvo en ese lugar?</div>
+          </div>
+        </div>
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 210" class="diagram" role="img"
+         aria-label="Grilla de poder despótico e infraestructural con cuatro tipos de Estado">
+      <g font-family="inherit">
+        <rect x="150" y="8"  width="230" height="34" rx="8" class="box box-b"/>
+        <text x="265" y="30" text-anchor="middle" class="box-title-xs">INFRAESTRUCTURA DÉBIL</text>
+
+        <rect x="400" y="8" width="230" height="34" rx="8" class="box box-b"/>
+        <text x="515" y="30" text-anchor="middle" class="box-title-xs">INFRAESTRUCTURA FUERTE</text>
+
+        <rect x="10" y="52" width="130" height="70" rx="8" class="box box-b"/>
+        <text x="75" y="83" text-anchor="middle" class="box-title-xs">DESPÓTICO</text>
+        <text x="75" y="98" text-anchor="middle" class="box-title-xs">DÉBIL</text>
+
+        <rect x="10" y="132" width="130" height="70" rx="8" class="box box-b"/>
+        <text x="75" y="163" text-anchor="middle" class="box-title-xs">DESPÓTICO</text>
+        <text x="75" y="178" text-anchor="middle" class="box-title-xs">FUERTE</text>
+
+        <rect x="150" y="52" width="230" height="70" rx="8" class="box"/>
+        <text x="265" y="92" text-anchor="middle" class="box-title-sm">Feudal</text>
+
+        <rect x="400" y="52" width="230" height="70" rx="8" class="box box-warn"/>
+        <text x="515" y="82" text-anchor="middle" class="box-title-sm">Burocrático</text>
+        <text x="515" y="100" text-anchor="middle" class="box-sub">democracias capitalistas</text>
+
+        <rect x="150" y="132" width="230" height="70" rx="8" class="box"/>
+        <text x="265" y="172" text-anchor="middle" class="box-title-sm">Imperial</text>
+
+        <rect x="400" y="132" width="230" height="70" rx="8" class="box"/>
+        <text x="515" y="162" text-anchor="middle" class="box-title-sm">Autoritario</text>
+        <text x="515" y="180" text-anchor="middle" class="box-sub">Alemania nazi, URSS</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="mann">
+      <div class="eyebrow-row">
+        <span class="eyebrow">MANN · 1984</span>
+        <span class="time-badge">⏱ 5 min</span>
+      </div>
+      <h2 class="headline">La autonomía nace de la centralidad territorial: el Estado es un lugar, y eso nadie más lo es.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li><strong>Necesidad:</strong> ninguna sociedad compleja prescinde de un centro que fije reglas vinculantes.</li>
+          <li><strong>Multiplicidad de funciones</strong> (orden interno, guerra, comunicaciones, redistribución) → «equilibrismo bonapartista» entre grupos.</li>
+          <li><strong>Centralidad territorial</strong> — su aporte más original: el Estado irradia autoridad desde un centro y se detiene en una frontera; ningún otro actor se organiza así.</li>
+        </ul>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para conversar</span>
+              <span class="d-format">Pregunta abierta al curso</span>
+            </div>
+            <div class="d-prompt">¿Qué caso chileno o latinoamericano reciente muestra un aumento del poder infraestructural del Estado? ¿Y uno que muestre, en cambio, un aumento del poder despótico?</div>
+          </div>
+        </div>
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 110" class="diagram" role="img"
+         aria-label="Cadena de la autonomía del Estado según Mann, de la necesidad al resultado territorial">
+      <g font-family="inherit">
+        <text x="0" y="30" class="flow-step">Necesidad de reglas</text>
+        <text x="158" y="30" class="flow-arrow">→</text>
+        <text x="178" y="30" class="flow-step">Funciones múltiples</text>
+        <text x="340" y="30" class="flow-arrow">→</text>
+        <text x="360" y="30" class="flow-step">Centralidad territorial</text>
+        <text x="545" y="30" class="flow-arrow">→</text>
+        <text x="565" y="30" class="flow-step">Autonomía</text>
+
+        <line x1="0" y1="55" x2="640" y2="55" class="divider"/>
+        <text x="320" y="82" text-anchor="middle" class="edge-label">resultado paradójico: el poder infraestructural no solo controla — territorializa a la sociedad</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="berezin">
+      <div class="eyebrow-row">
+        <span class="eyebrow">BEREZIN ET AL. · 2020</span>
+        <span class="time-badge">⏱ 3 min</span>
+      </div>
+      <h2 class="headline">La cultura política no es solo significado compartido: es significado regulado por instituciones.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li><strong>Cultura</strong> = una «red de significados» compartida y pública (Geertz) — no algo oculto, algo que todos dan por sentado.</li>
+          <li><strong>«Cultura profunda»:</strong> lo que un niño de 7 años ya sabe sin que nadie se lo explique (Haffner) — parentesco con los «hechos sociales» de Durkheim.</li>
+          <li><strong>Institución</strong> = «cultura que no se deja al azar» (retomando a Parsons) — el giro clave del capítulo.</li>
+        </ul>
+
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 110" class="diagram" role="img"
+         aria-label="De la cultura a la cultura política a través de las instituciones">
+      <g font-family="inherit">
+        <rect x="10" y="10" width="180" height="80" rx="10" class="box box-a"/>
+        <text x="100" y="40" text-anchor="middle" class="box-title-sm">Cultura</text>
+        <text x="100" y="60" text-anchor="middle" class="box-sub">red de significados</text>
+        <text x="100" y="75" text-anchor="middle" class="box-sub">compartidos (Geertz)</text>
+
+        <path d="M190,50 L230,50" class="arrow"/>
+
+        <rect x="230" y="10" width="180" height="80" rx="10" class="box box-a"/>
+        <text x="320" y="40" text-anchor="middle" class="box-title-sm">Instituciones</text>
+        <text x="320" y="60" text-anchor="middle" class="box-sub">«cultura que no se</text>
+        <text x="320" y="75" text-anchor="middle" class="box-sub">deja al azar» (Parsons)</text>
+
+        <path d="M410,50 L450,50" class="arrow"/>
+
+        <rect x="450" y="10" width="180" height="80" rx="10" class="box box-warn"/>
+        <text x="540" y="40" text-anchor="middle" class="box-title-sm">Cultura política</text>
+        <text x="540" y="60" text-anchor="middle" class="box-sub">significado regulado</text>
+        <text x="540" y="75" text-anchor="middle" class="box-sub">por instituciones</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="berezin">
+      <div class="eyebrow-row">
+        <span class="eyebrow">BEREZIN ET AL. · 2020</span>
+        <span class="time-badge">⏱ 4 min</span>
+      </div>
+      <h2 class="headline">Nación y Estado son analíticamente distintos — y su fusión es más frágil de lo que parece.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li><strong>Nación</strong> = comunidad de sentido compartido. <strong>Estado</strong> = tecnología de gobierno: leyes y burocracias.</li>
+          <li>Cuatro combinaciones posibles: Estado-nación, Estado sin nación (ex-Yugoslavia), nación sin Estado (kurdos, palestinos), formas premodernas.</li>
+          <li>Nacionalismo: primordialismo («comunidad natural») vs. constructivismo (Anderson: «comunidad imaginada»); étnico vs. cívico.</li>
+        </ul>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para conversar</span>
+              <span class="d-format">Pregunta abierta al curso</span>
+            </div>
+            <div class="d-prompt">¿Se les ocurre otro caso de nación-sin-Estado o Estado-sin-nación, más allá de los del texto?</div>
+          </div>
+        </div>
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 210" class="diagram" role="img"
+         aria-label="Grilla de nación y Estado con cuatro combinaciones posibles">
+      <g font-family="inherit">
+        <rect x="150" y="8"  width="230" height="34" rx="8" class="box box-b"/>
+        <text x="265" y="30" text-anchor="middle" class="box-title-xs">SIN ESTADO</text>
+
+        <rect x="400" y="8" width="230" height="34" rx="8" class="box box-b"/>
+        <text x="515" y="30" text-anchor="middle" class="box-title-xs">CON ESTADO</text>
+
+        <rect x="10" y="52" width="130" height="70" rx="8" class="box box-b"/>
+        <text x="75" y="92" text-anchor="middle" class="box-title-xs">SIN NACIÓN</text>
+
+        <rect x="10" y="132" width="130" height="70" rx="8" class="box box-b"/>
+        <text x="75" y="172" text-anchor="middle" class="box-title-xs">CON NACIÓN</text>
+
+        <rect x="150" y="52" width="230" height="70" rx="8" class="box"/>
+        <text x="265" y="83" text-anchor="middle" class="box-title-sm">Formas premodernas</text>
+        <text x="265" y="100" text-anchor="middle" class="box-sub">feudales, tradicionales</text>
+
+        <rect x="400" y="52" width="230" height="70" rx="8" class="box"/>
+        <text x="515" y="83" text-anchor="middle" class="box-title-sm">Estado sin nación</text>
+        <text x="515" y="100" text-anchor="middle" class="box-sub">ex-Yugoslavia</text>
+
+        <rect x="150" y="132" width="230" height="70" rx="8" class="box"/>
+        <text x="265" y="163" text-anchor="middle" class="box-title-sm">Nación sin Estado</text>
+        <text x="265" y="180" text-anchor="middle" class="box-sub">kurdos, palestinos, rohinyás</text>
+
+        <rect x="400" y="132" width="230" height="70" rx="8" class="box box-warn"/>
+        <text x="515" y="163" text-anchor="middle" class="box-title-sm">Estado-nación</text>
+        <text x="515" y="180" text-anchor="middle" class="box-sub">el modelo post-1789</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="berezin">
+      <div class="eyebrow-row">
+        <span class="eyebrow">BEREZIN ET AL. · 2020</span>
+        <span class="time-badge">⏱ 5 min</span>
+      </div>
+      <h2 class="headline">Practicar la política es también practicar una cultura — y no siempre una democrática.</h2>
+      <div class="body-grid">
+        <div>
+        <ul class="bullets">
+          <li>Cuatro formas de participación, cada una también cultural: pluralismo, asociacionismo, discurso, movimientos sociales.</li>
+          <li><strong>El asociacionismo es ambivalente:</strong> el Ku Klux Klan y la mafia siciliana también generaron «capital social» (Tocqueville/Putnam).</li>
+          <li>Más allá del territorio: religión y derechos humanos como cultura política transnacional — lectura crítica del «choque de civilizaciones» de Huntington.</li>
+        </ul>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para conversar</span>
+              <span class="d-format">Pregunta abierta al curso</span>
+            </div>
+            <div class="d-prompt">Piensen en una asociación o comunidad chilena con mucho «capital social» que no sea necesariamente democrática. ¿Qué la hace posible?</div>
+          </div>
+        </div>
+        </div>
+        <div class="visual-wrap"><svg width="0" height="0">
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+    <path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"/>
+  </marker>
+</defs>
+</svg>
+    <svg viewBox="0 0 640 110" class="diagram" role="img"
+         aria-label="Cuatro formas de participación política, cada una también cultural">
+      <g font-family="inherit">
+        <rect x="15" y="30" width="130" height="46" rx="23" class="box box-b"/><text x="80" y="58" text-anchor="middle" class="box-title-xs">pluralismo</text>
+<rect x="165" y="30" width="130" height="46" rx="23" class="box box-b"/><text x="230" y="58" text-anchor="middle" class="box-title-xs">asociacionismo</text>
+<rect x="315" y="30" width="130" height="46" rx="23" class="box box-b"/><text x="380" y="58" text-anchor="middle" class="box-title-xs">discurso</text>
+<rect x="465" y="30" width="130" height="46" rx="23" class="box box-b"/><text x="530" y="58" text-anchor="middle" class="box-title-xs">movimientos</text>
+        <text x="320.0" y="98" text-anchor="middle" class="edge-label">cada forma de participar es también una forma de practicar cultura</text>
+      </g>
+    </svg>
+    </div>
+      </div>
+    </section>
+
+    <section class="slide" data-accent="neutral">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Síntesis</span>
+        <span class="time-badge">⏱ 6 min</span>
+      </div>
+      <h2 class="headline">Dos respuestas a la misma pregunta: ¿el Estado se explica por su organización, o por su cultura?</h2>
+
+        <table class="compare-table">
+          <thead><tr><th></th><th>Mann</th><th>Berezin et al.</th></tr></thead>
+          <tbody>
+<tr><td>Tradición</td><td>Sociología histórica comparada</td><td>Sociología cultural</td></tr>
+<tr><td>Unidad de análisis</td><td>Territorio / capacidad estatal</td><td>Significado / instituciones</td></tr>
+<tr><td>Qué es el poder</td><td>Capacidad despótica e infraestructural</td><td>Sentido compartido regulado institucionalmente</td></tr>
+<tr><td>Método</td><td>Comparación histórica de tipos de Estado</td><td>Análisis cultural de instituciones y prácticas</td></tr>
+<tr><td>Conclusión sobre el Estado</td><td>La autonomía nace de la centralidad territorial</td><td>La autonomía nace de la «cultura profunda» compartida</td></tr>
+          </tbody>
+        </table>
+
+        <div class="discussion">
+          <div class="bubble"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 4h16v12H8l-4 4V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+</svg></div>
+          <div>
+            <div class="d-head">
+              <span class="d-label">Para cerrar</span>
+              <span class="d-format">Pregunta abierta al curso</span>
+            </div>
+            <div class="d-prompt">¿Puede un Estado ser infraestructuralmente poderoso sin una «cultura profunda» compartida? ¿Con qué autor se quedan para explicar el Estado chileno de hoy — o con los dos?</div>
+          </div>
+        </div>
+    </section>
+
+    <section class="slide" data-accent="neutral">
+      <div class="eyebrow-row">
+        <span class="eyebrow">Referencias</span>
+        <span class="time-badge">⏱ 1 min</span>
+      </div>
+      <h2 class="headline">Referencias (APA 7)</h2>
+      <ul class="references-list">
+          <li>Mann, M. (1984). The autonomous power of the state: Its origins, mechanisms and results. <em>European Journal of Sociology, 25</em>(2), 185–213.<span class="ref-doi">https://doi.org/10.1017/S0003975600004239</span><span class="ref-note">Cita en texto: (Mann, 1984)</span></li>
+          <li>Berezin, M., Sandusky, E., & Davidson, T. (2020). Culture in politics and politics in culture: Institutions, practices, and boundaries. In T. Janoski, C. de Leon, J. Misra, & I. W. Martin (Eds.), <em>The new handbook of political sociology</em> (pp. 102–131). Cambridge University Press.<span class="ref-doi">https://doi.org/10.1017/9781108147828.005</span><span class="ref-note">Cita en texto: (Berezin et al., 2020)</span></li>
+      </ul>
+    </section>
+  </div>
+  <div class="hud">
+    <button class="nav-btn nav-prev" aria-label="Anterior">‹</button>
+    <span class="counter">1 / 10</span>
+    <button class="nav-btn nav-next" aria-label="Siguiente">›</button>
+  </div>
+  <script>
+
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var current = 0;
+
+  var progress = document.querySelector('.progress');
+  var counter = document.querySelector('.counter');
+  var btnPrev = document.querySelector('.nav-prev');
+  var btnNext = document.querySelector('.nav-next');
+
+  function render() {
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === current);
+    });
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+  }
+
+  function go(delta) {
+    current = Math.min(total - 1, Math.max(0, current + delta));
+    render();
+  }
+
+  btnPrev.addEventListener('click', function () { go(-1); });
+  btnNext.addEventListener('click', function () { go(1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (['ArrowRight', 'PageDown', ' '].indexOf(e.key) !== -1) { go(1); e.preventDefault(); }
+    if (['ArrowLeft', 'PageUp'].indexOf(e.key) !== -1) { go(-1); e.preventDefault(); }
+    if (e.key === 'Home') { current = 0; render(); }
+    if (e.key === 'End') { current = total - 1; render(); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); }
+      else { document.exitFullscreen(); }
+    }
+  });
+
+  var touchStartX = null;
+  document.addEventListener('touchstart', function (e) { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', function (e) {
+    if (touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) { go(dx < 0 ? 1 : -1); }
+    touchStartX = null;
+  });
+
+  render();
+})();
+
+  </script>
+</body>
+</html>
